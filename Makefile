@@ -1,8 +1,7 @@
 CC=g++
-LIBDIR=/home/sgeraedt/entanglement/
-MYDIR=/home/sgeraedt/myClibrary/
-CFLAGS=-c -O3 -fopenmp -I$(LIBDIR) -I$(MYDIR)
-LDFLAGS=-fopenmp -I$(LIBDIR) -I$(MYDIR)
+LIBDIR=/home/sgeraedt/Loops/
+CFLAGS=-c -O3 -fopenmp -I$(LIBDIR) 
+LDFLAGS=-fopenmp -I$(LIBDIR) 
 SOURCES=lattice.cpp lattice.h ising.cpp ising.h mainLoopy.cpp loopy.cpp loopy.h VTable.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=a.out
