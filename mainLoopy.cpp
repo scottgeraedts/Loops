@@ -3,7 +3,7 @@
  * Used for two species of loops with 1/r^2 interactions
  */
 
-#include "loopy.h"
+#include "rods.h"
 
 using namespace std;
 
@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
 
 	//the things you want to print
 	counter["JJ"]=0;
+	counter["QQ"]=0;
 	counter["M"]=0;
 
 	ofstream hist;
@@ -40,7 +41,7 @@ int main(int argc, char** argv) {
 	hist.open(filename.str().c_str());
 
 	//create lattice, choose what kind you want
-	UPDATER<LOOPY> sim(params);
+	UPDATER<RODS> sim(params);
 
 	sim.random_update(params["NWarmUps"]);
 	double e;
@@ -52,6 +53,7 @@ int main(int argc, char** argv) {
 		counter["E2"]+=e*e/steps;
 		counter["M"]+=sim.lat.magnetization()/steps;
 		counter["JJ"]+=sim.lat.rho()/steps;
+		counter["QQ"]+=sim.lat.rho()/steps;
 		//make your measurements
 //        for(int m=0;m<3;m++){
 //           for(int n=1;n<3;n++){
@@ -59,7 +61,7 @@ int main(int argc, char** argv) {
 //           }
 //        }
 
-		hist<<e<<" "<<endl;//comment this our when you're done checking
+		hist<<e<<" "<<sim.lat.energy()<<endl;//comment this our when you're done checking
 	}
 
 	ofstream out;
