@@ -22,6 +22,8 @@ int main(int argc, char** argv) {
 	//get model-dependent parameters	
 	cfin>>params["t1"];
 	cfin>>params["t2"];
+	cfin>>params["lambda1"];
+	cfin>>params["lambda2"];
 	cfin.close();
 
 	map<string,double> counter;

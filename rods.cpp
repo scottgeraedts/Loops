@@ -8,6 +8,8 @@ RODS::RODS(map<string,double> &params):LATTICE( params){
 	}
 	t1=params["t1"];
 	t2=params["t2"];
+	lambda1=params["lambda1"];
+	lambda2=params["lambda2"];
 	phi=vector<double>(N,0);
 	vector<int> temp3(3,0);
 	a=vector<vector<int> >(N,temp3);
@@ -16,17 +18,17 @@ RODS::RODS(map<string,double> &params):LATTICE( params){
 	
 	//add functons and their weights to the function list
 	updateFuncs.push_back(&RODS::updatePhi);
-	updateFuncs.push_back(&RODS::updateA);
+//	updateFuncs.push_back(&RODS::updateA);
 	updateFuncs.push_back(&RODS::updatePP);
-	updateFuncs.push_back(&RODS::compAP);
-	updateFuncs.push_back(&RODS::starUpdate);
+//	updateFuncs.push_back(&RODS::compAP);
+//	updateFuncs.push_back(&RODS::starUpdate);
 	updateFuncs.push_back(&RODS::updateGamma);
 	updateWeights.push_back(1.0*N);//phi
-	updateWeights.push_back(1.0*N);//a
+//	updateWeights.push_back(1.0*N);//a
 	updateWeights.push_back(1.0*N);//pp
-	updateWeights.push_back(1.0*N);//pp+a
-	updateWeights.push_back(1.0*N);//star
-	updateWeights.push_back(3.0);
+//	updateWeights.push_back(1.0*N);//pp+a
+//	updateWeights.push_back(1.0*N);//star
+	updateWeights.push_back(3.0);  //gamma
 	
 	//zero the correlators. correlators are labelled [start][direction][distance]
 	vector< complex<double> > tempc(L,0);
@@ -43,10 +45,11 @@ RODS::RODS(){};
 double RODS::energy(){
 	double out=0.0;
 	for (int i=0;i<N;i++){
+		out-=lambda1*cos(2*phi[i]);
 		for (int d=0;d<DIMS;d++){
 			out+=0.5*t1*pow(cosTerm(i,d),2);
-			for(int d2=d+1;d2<3;d2++)
-				out+=1.0/(2.0*t2)*pow(curl(a,i,d,d2)-curl(pp,i,d,d2),2);
+//			for(int d2=d+1;d2<3;d2++)
+//				out+=1.0/(2.0*t2)*pow(curl(a,i,d,d2)-curl(pp,i,d,d2),2);
 		}
 	}
 	return out;
@@ -58,6 +61,8 @@ int RODS::updatePhi(int i){
 	double step=ran.rand(2.0*angle_step)-angle_step;
 	double newphi=mod2pi(phi[i]+step);
 
+	oldE-=lambda1*cos(2*phi[i]);
+	newE-=lambda1*cos(2*newphi);
 	for(int d=0;d<3;d++){
 		oldE+=0.5*t1*(pow(cosTerm(i,d),2)+pow(cosTerm((this->*m)(i,d),d), 2) );
 		newE+=0.5*t1*(pow(newphi-phi[(this->*p)(i,d)]-2*pi*pp[i][d]+end[i][d]*gamma[d],2)+pow(phi[(this->*m)(i,d)]-newphi-2*pi*pp[(this->*m)(i,d)][d]+end[(this->*m)(i,d)][d]*gamma[d], 2) );
@@ -77,7 +82,7 @@ int RODS::updatePhi(int i){
 int RODS::updateA(int in){
 	int site=in/3;
 	int d=in%3;
-	if( ( site%L==0 || site%L==L/2) && (d==1 || d==2) ) return 0;
+//	if( ( site%L==0 || site%L==L/2) && (d==1 || d==2) ) return 0;
 	double oldE=0.0, newE=0.0;
 	double r=ran.rand();
 	int step=1;
@@ -105,12 +110,12 @@ int RODS::updatePP(int in){
 	int step=1;
 	if (r<0.5) step=-1;
 	oldE+=0.5*t1*pow(cosTerm(site,d),2);
-	for (int d2=1;d2<3;d2++)
-		oldE+=1.0/(2.0*t2)*pow(curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3),2)+1.0/(2.0*t2)*pow(curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3),2);
+//	for (int d2=1;d2<3;d2++)
+//		oldE+=1.0/(2.0*t2)*pow(curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3),2)+1.0/(2.0*t2)*pow(curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3),2);
 	pp[site][d]+=step;	
 	newE+=0.5*t1*pow(cosTerm(site,d),2);
-	for (int d2=1;d2<3;d2++)
-		newE+=1.0/(2.0*t2)*pow(curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3),2)+1.0/(2.0*t2)*pow(curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3),2);
+//	for (int d2=1;d2<3;d2++)
+//		newE+=1.0/(2.0*t2)*pow(curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3),2)+1.0/(2.0*t2)*pow(curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3),2);
 	int accept=0;
 	if(newE<oldE) accept=1;
 	else{
@@ -124,7 +129,7 @@ int RODS::updatePP(int in){
 int RODS::compAP(int in){
 	int site=in/3;
 	int d=in%3;
-	if( ( site%L==0 || site%L==L/2) && (d==1 || d==2) ) return 0;
+//	if( ( site%L==0 || site%L==L/2) && (d==1 || d==2) ) return 0;
 	double oldE=0.0, newE=0.0;
 	double r=ran.rand();
 	int step=1;
