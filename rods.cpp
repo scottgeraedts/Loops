@@ -18,15 +18,15 @@ RODS::RODS(map<string,double> &params):LATTICE( params){
 	
 	//add functons and their weights to the function list
 	updateFuncs.push_back(&RODS::updatePhi);
-//	updateFuncs.push_back(&RODS::updateA);
+	updateFuncs.push_back(&RODS::updateA);
 	updateFuncs.push_back(&RODS::updatePP);
-//	updateFuncs.push_back(&RODS::compAP);
+	updateFuncs.push_back(&RODS::compAP);
 //	updateFuncs.push_back(&RODS::starUpdate);
 	updateFuncs.push_back(&RODS::updateGamma);
 	updateWeights.push_back(1.0*N);//phi
-//	updateWeights.push_back(1.0*N);//a
+	updateWeights.push_back(1.0*N);//a
 	updateWeights.push_back(1.0*N);//pp
-//	updateWeights.push_back(1.0*N);//pp+a
+	updateWeights.push_back(1.0*N);//pp+a
 //	updateWeights.push_back(1.0*N);//star
 	updateWeights.push_back(3.0);  //gamma
 	
@@ -44,12 +44,16 @@ RODS::RODS(map<string,double> &params):LATTICE( params){
 RODS::RODS(){};
 double RODS::energy(){
 	double out=0.0;
+	int JminusQ;
 	for (int i=0;i<N;i++){
 		out-=lambda1*cos(2*phi[i]);
 		for (int d=0;d<DIMS;d++){
 			out+=0.5*t1*pow(cosTerm(i,d),2);
-//			for(int d2=d+1;d2<3;d2++)
-//				out+=1.0/(2.0*t2)*pow(curl(a,i,d,d2)-curl(pp,i,d,d2),2);
+			for(int d2=d+1;d2<3;d2++){
+				JminusQ=curl(a,i,d,d2)-curl(pp,i,d,d2);
+				out+=1.0/(2.0*t2)*pow(JminusQ,2);
+				out-=lambda2*cos(pi*JminusQ);
+			}
 		}
 	}
 	return out;
@@ -85,13 +89,21 @@ int RODS::updateA(int in){
 //	if( ( site%L==0 || site%L==L/2) && (d==1 || d==2) ) return 0;
 	double oldE=0.0, newE=0.0;
 	double r=ran.rand();
-	int step=1;
+	int step=1,JminusQ;
 	if (r<0.5) step=-1;
-	for (int d2=1;d2<3;d2++)
-		oldE+=1.0/(2.0*t2)*pow(curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3),2)+1.0/(2.0*t2)*pow(curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3),2);
+	for (int d2=1;d2<3;d2++){
+		JminusQ=curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3);
+		oldE+=1.0/(2.0*t2)*pow(JminusQ,2)-lambda2*cos(pi*JminusQ);
+		JminusQ=curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3);
+		oldE+=1.0/(2.0*t2)*pow(JminusQ,2)-lambda2*cos(pi*JminusQ);
+	}	
 	a[site][d]+=step;	
-	for (int d2=1;d2<3;d2++)
-		newE+=1.0/(2.0*t2)*pow(curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3),2)+1.0/(2.0*t2)*pow(curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3),2);
+	for (int d2=1;d2<3;d2++){
+		JminusQ=curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3);
+		newE+=1.0/(2.0*t2)*pow(JminusQ,2)-lambda2*cos(pi*JminusQ);
+		JminusQ=curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3);
+		newE+=1.0/(2.0*t2)*pow(JminusQ,2)-lambda2*cos(pi*JminusQ);
+	}	
 	int accept=0;
 	if(newE<oldE) accept=1;
 	else{
@@ -107,15 +119,23 @@ int RODS::updatePP(int in){
 	int d=in%3;
 	double oldE=0.0, newE=0.0;
 	double r=ran.rand();
-	int step=1;
+	int step=1,JminusQ;
 	if (r<0.5) step=-1;
 	oldE+=0.5*t1*pow(cosTerm(site,d),2);
-//	for (int d2=1;d2<3;d2++)
-//		oldE+=1.0/(2.0*t2)*pow(curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3),2)+1.0/(2.0*t2)*pow(curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3),2);
+	for (int d2=1;d2<3;d2++){
+		JminusQ=curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3);
+		oldE+=1.0/(2.0*t2)*pow(JminusQ,2)-lambda2*cos(pi*JminusQ);
+		JminusQ=curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3);
+		oldE+=1.0/(2.0*t2)*pow(JminusQ,2)-lambda2*cos(pi*JminusQ);
+	}	
 	pp[site][d]+=step;	
 	newE+=0.5*t1*pow(cosTerm(site,d),2);
-//	for (int d2=1;d2<3;d2++)
-//		newE+=1.0/(2.0*t2)*pow(curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3),2)+1.0/(2.0*t2)*pow(curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3),2);
+	for (int d2=1;d2<3;d2++){
+		JminusQ=curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3);
+		newE+=1.0/(2.0*t2)*pow(JminusQ,2)-lambda2*cos(pi*JminusQ);
+		JminusQ=curl(a,(this->*m)(site,(d+d2)%3),d,(d+d2)%3)-curl(pp,(this->*m)(site,(d+d2)%3),d,(d+d2)%3);
+		newE+=1.0/(2.0*t2)*pow(JminusQ,2)-lambda2*cos(pi*JminusQ);
+	}	
 	int accept=0;
 	if(newE<oldE) accept=1;
 	else{

@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
 		counter["E2"]+=e*e/steps;
 		counter["M"]+=sim.lat.magnetization()/steps;
 		counter["JJ"]+=sim.lat.rho()/steps;
-		counter["QQ"]+=sim.lat.rho()/steps;
+		counter["QQ"]+=sim.lat.QQ()/steps;
 		counter["Z2M"]+=sim.lat.Z2magnetization()/steps;
 		//make your measurements
 //        for(int m=0;m<3;m++){
@@ -72,11 +72,11 @@ int main(int argc, char** argv) {
 	ofstream out;
 	out.open("out");
     out<<"# Loop lattice model for L="<<params["L"]<<" with "<<params["NWarmUps"]<<" warmup sweeps, "<<params["NMeas"]<<" measurements and "<<params["NSteps"]<<" sweeps between measurements"<<endl;
-	out<<"#t1 t2";
+	out<<"#t1 t2 lambda1 lambda2 ";
 	for (map<string,double>::iterator it=counter.begin(); it!=counter.end();++it)
 		out<<it->first<<" ";
 	out<<endl;
-	out<<params["t1"]<<" "<<params["t2"]<<" ";
+	out<<params["t1"]<<" "<<params["t2"]<<" "<<params["lambda1"]<<" "<<params["lambda2"]<<" ";
 	for (map<string,double>::iterator it=counter.begin(); it!=counter.end();++it)
 		out<<it->second<<" ";
 	out<<endl;
