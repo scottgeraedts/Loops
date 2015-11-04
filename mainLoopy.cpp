@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
 	counter["JJ"]=0;
 	counter["QQ"]=0;
 	counter["M"]=0;
+	counter["Z2M"]=0;
 
 	ofstream hist;
 	ostringstream filename;
@@ -57,6 +58,7 @@ int main(int argc, char** argv) {
 		counter["M"]+=sim.lat.magnetization()/steps;
 		counter["JJ"]+=sim.lat.rho()/steps;
 		counter["QQ"]+=sim.lat.rho()/steps;
+		counter["Z2M"]+=sim.lat.Z2magnetization()/steps;
 		//make your measurements
 //        for(int m=0;m<3;m++){
 //           for(int n=1;n<3;n++){

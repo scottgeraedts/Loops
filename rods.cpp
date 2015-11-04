@@ -227,7 +227,14 @@ double RODS::magnetization(){
 	y=y/(1.0*N);
 	return (pow(x,2)+pow(y,2));
 }
-
+double RODS::Z2magnetization(){
+	complex<double> out(0,0);
+	for(int i=0;i<N;i++){
+		out+=polar(1.,2*phi[i]);
+	}
+	out/=(1.0*N);
+	return abs(out);
+}	
 double RODS::rho(){
 	double out;
 	for(unsigned d1=0;d1<3;d1++){

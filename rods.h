@@ -10,14 +10,17 @@ class RODS:public LATTICE
 public:
 	RODS(map<string,double> &params);
 	RODS();
+	vector<int (RODS::*)(int)>updateFuncs;
+	vector<double> updateWeights;
+	
 	double magnetization();
+	double Z2magnetization();
 	double rho();
 	double QQ();
 	double energy();
-	vector<int (RODS::*)(int)>updateFuncs;
-	vector<double> updateWeights;
 	void updateCorrelators();
 	void printCorrelators(int);
+
 private:
 	int updateA(int site);
 	int updatePP(int site);
