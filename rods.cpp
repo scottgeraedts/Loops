@@ -90,7 +90,11 @@ int RODS::updateA(int in){
 	double oldE=0.0, newE=0.0;
 	double r=ran.rand();
 	int step=1,JminusQ;
-	if (r<0.5) step=-1;
+	if (r<0.25) step=-2;
+	else if(r<0.5) step=-1;
+	else if(r<0.75) step=1;
+	else step=2;
+	
 	for (int d2=1;d2<3;d2++){
 		JminusQ=curl(a,site,d,(d+d2)%3)-curl(pp,site,d,(d+d2)%3);
 		oldE+=1.0/(2.0*t2)*pow(JminusQ,2)-lambda2*cos(pi*JminusQ);
