@@ -16,9 +16,9 @@ LATTICE::LATTICE(map<string,double> &params){
 	vector<int>temp3(DIMS,0);
 	end=vector<vector<int> >(N,temp3);
 	for (int i=0;i<N;i++){
-		if (i%Lt==Lt-1) end[i][0]==1;
+		if (i%Lt==Lt-1) end[i][0]=1;
 		for (int d=1;d<DIMS;d++){
-			if( (i/(Lt*pow(L,d-1)) )%L==L-1) end[i][d]==1;
+			if( (i/(Lt*pow(L,d-1)) )%L==L-1) end[i][d]=1;
 		}
 	}
 	p=&LATTICE::p_normal;

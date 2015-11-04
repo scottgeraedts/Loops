@@ -23,8 +23,9 @@ private:
 	int updatePP(int site);
 	int updateGamma(int site);
 	int updatePhi(int site);
-	int updateP(int site);
 	int compAP(int site);
+	int starUpdate(int site);
+	
 	double cosTerm(int site,int d);
 	double angle_step;
 	double shiftedphi(int);	
@@ -35,6 +36,7 @@ private:
 	vector<vector<int> > pp;
 	double t1,t2,theta;
 	vector<vector<vector<complex<double> > > > cors;
+	vector< complex<double> > avgphi;
 };
 
 #endif
