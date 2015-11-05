@@ -22,13 +22,13 @@ RODS::RODS(map<string,double> &params):LATTICE( params){
 	updateFuncs.push_back(&RODS::updateA);
 	updateFuncs.push_back(&RODS::updatePP);
 	updateFuncs.push_back(&RODS::compAP);
-	updateFuncs.push_back(&RODS::starUpdate);
+	if(edge) updateFuncs.push_back(&RODS::starUpdate);
 	updateFuncs.push_back(&RODS::updateGamma);
 	updateWeights.push_back(1.0*N);//phi
 	updateWeights.push_back(1.0*N);//a
 	updateWeights.push_back(1.0*N);//pp
 	updateWeights.push_back(1.0*N);//pp+a
-	updateWeights.push_back(1.0*N);//star
+	if(edge) updateWeights.push_back(1.0*N);//star
 	updateWeights.push_back(3.0);  //gamma
 	
 	//zero the correlators. correlators are labelled [start][direction][distance]
@@ -65,8 +65,9 @@ int RODS::updatePhi(int i){
 	double oldE=0.0, newE=0.0;
 	double r=ran.rand();
 	double step;
-	if (r<0.8) step=r*2.0*angle_step-angle_step;
-	else step=(1-r)*2.0*angle_step-angle_step+pi;
+//	if (r<0.8) step=r*2.0*angle_step-angle_step;
+//	else step=(1-r)*2.0*angle_step-angle_step+pi;
+	step=r*2.0*angle_step-angle_step;
 	
 	double newphi=mod2pi(phi[i]+step);
 
@@ -192,14 +193,20 @@ int RODS::starUpdate(int in){
 	double r=ran.rand();
 	int step=1;
 	if (r<0.5) step=-1;
-	int site;
+	int site,sign;
 	for(int d2=0;d2<2;d2++){
 		for(int k=0;k<2;k++){
-			if(k==0) site=i;
-			else site=(this->*m)(i, (d+d2)%3);
+			if(k==0){
+				site=i;
+				sign=1;
+			}
+			else{
+				site=(this->*m)(i, (d+d2)%3);
+				sign=-1;
+			}
 			oldE+=0.5*t1*pow(cosTerm(site,(d+d2)%3),2);
-			pp[site][(d+d2)%3]+=step;
-			a[site][(d+d2)%3]+=step;
+			pp[site][(d+d2)%3]+=sign*step;
+			a[site][(d+d2)%3]+=sign*step;
 			newE+=0.5*t1*pow(cosTerm(site,(d+d2)%3),2);
 		}
 	}
@@ -214,10 +221,16 @@ int RODS::starUpdate(int in){
 	}else{
 		for(int d2=0;d2<2;d2++){
 			for(int k=0;k<2;k++){
-				if(k==0) site=i;
-				else site=(this->*m)(i, (d+d2)%3);
-				pp[site][(d+d2)%3]-=step;
-				a[site][(d+d2)%3]-=step;
+				if(k==0){
+					site=i;
+					sign=1;
+				}
+				else{
+					site=(this->*m)(i, (d+d2)%3);
+					sign=-1;
+				}
+				pp[site][(d+d2)%3]-=sign*step;
+				a[site][(d+d2)%3]-=sign*step;
 			}	
 		}
 	}

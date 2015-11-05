@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 	double steps=1.0*params["NMeas"];
 	for(int j=0;j<params["NMeas"];j++){
 		sim.random_update(params["NSteps"]);
-		sim.lat.updateCorrelators();
+		if(params["edge"]) sim.lat.updateCorrelators();
 		e=sim.lat.E();
 		counter["E"]+=e/steps;
 		counter["E2"]+=e*e/steps;
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 
 		hist<<e<<" "<<sim.lat.energy()<<endl;//comment this our when you're done checking
 	}
-	sim.lat.printCorrelators(params["NMeas"]);
+	if(params["edge"]) sim.lat.printCorrelators(params["NMeas"]);
 	ofstream out;
 	out.open("out");
     out<<"# Loop lattice model for L="<<params["L"]<<" with "<<params["NWarmUps"]<<" warmup sweeps, "<<params["NMeas"]<<" measurements and "<<params["NSteps"]<<" sweeps between measurements"<<endl;
