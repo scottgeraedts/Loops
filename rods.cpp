@@ -65,8 +65,8 @@ int RODS::updatePhi(int i){
 	double oldE=0.0, newE=0.0;
 	double r=ran.rand();
 	double step;
-	step=r*2.0*angle_step-angle_step;
-	if (r>0.8) step+=pi;
+	if (r<0.8) step=r*2.0*angle_step-angle_step;
+	else step=(1-r)*2.0*angle_step-angle_step+pi;
 	
 	double newphi=mod2pi(phi[i]+step);
 
