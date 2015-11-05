@@ -24,6 +24,7 @@ int main(int argc, char** argv) {
 	cfin>>params["t2"];
 	cfin>>params["lambda1"];
 	cfin>>params["lambda2"];
+	cfin>>params["edge"];
 	cfin.close();
 
 	map<string,double> counter;

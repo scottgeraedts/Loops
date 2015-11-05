@@ -39,6 +39,7 @@ private:
 	vector<vector<int> > pp;
 	double t1,t2,theta;
 	double lambda1,lambda2;
+	int edge;
 	vector<vector<vector<complex<double> > > > cors;
 	vector< complex<double> > avgphi;
 };
