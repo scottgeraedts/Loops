@@ -16,6 +16,7 @@ public:
 	double magnetization();
 	double Z2magnetization();
 	double rho();
+	double Z2rho();
 	double QQ();
 	double energy();
 	void updateCorrelators();

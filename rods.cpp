@@ -191,8 +191,11 @@ int RODS::starUpdate(int in){
 	int d=in%3;
 	double oldE=0.0, newE=0.0;
 	double r=ran.rand();
-	int step=1;
-	if (r<0.5) step=-1;
+	int step;
+	if (r<0.25) step=-2;
+	else if (r<0.5) step=-1;
+	else if (r<0.75) step=1;
+	else step=2;
 	int site,sign;
 	for(int d2=0;d2<2;d2++){
 		for(int k=0;k<2;k++){
@@ -282,6 +285,29 @@ double RODS::rho(){
 	for(unsigned d1=0;d1<3;d1++){
 		for(unsigned d2=d1+1;d2<3;d2++)
 			out+=rhoHelper(a, d1,d2);
+	}
+	return out/6.0;
+}
+double RODS::Z2rho(){
+	double out;
+    double angle;
+    double Lu;
+    complex<double> px=0.0;
+	int pos;
+    int u1,u2;
+	for(unsigned d1=0;d1<3;d1++){
+		for(unsigned d2=d1+1;d2<3;d2++){
+			out+=rhoHelper(a, d1,d2);
+			u1=(d1+1)%3;
+			u2=(d1+2)%3;
+			for(int i=0;i<N;i++){
+				pos=(this->*p)(i,d1);
+				Lu=cos(pi*curl(a,pos,u1,u2));
+				angle=(2.0*pi/(1.0*L))*((int)(i/pow(L,d2))%L);
+				px+=Lu*polar(1.,angle);
+			}
+			out+=abs(px)/(1.0*N);
+		}
 	}
 	return out/6.0;
 }

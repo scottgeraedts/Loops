@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
 //           }
 //        }
 
-		hist<<e<<" "<<sim.lat.energy()<<endl;//comment this our when you're done checking
+		hist<<e<<endl;//" "<<sim.lat.energy()<<endl;//comment this our when you're done checking
 	}
 	if(params["edge"]) sim.lat.printCorrelators(params["NMeas"]);
 	ofstream out;
